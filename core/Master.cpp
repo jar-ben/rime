@@ -261,10 +261,10 @@ MSS Master::grow_formula(Formula &f, Formula conflicts){
 	}
 
 	Formula mss;
-	if(satSolver->grow_alg == "combined"){
+	if(satSolver->grow_alg == "combined" || satSolver->grow_alg == "fixpoint"){
 		grow_combined(f, conflicts);
 		mss = f;
-	}else if(satSolver->grow_alg == "fixpoint"){
+	}else if(satSolver->grow_alg == "fixpoint"){//JB: this is currently disable with the above if
 		satSolver->grow_alg = "cmp";
 		mss = satSolver->grow(f, conflicts);
 		satSolver->grow_alg = "fixpoint";
