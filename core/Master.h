@@ -83,28 +83,9 @@ public:
 
 	int rotateMSS(Formula mss);
 
-	//reMUS algorithm functions
-	int depthMUS;
-	float dim_reduction;
-	int current_depth;
-	void find_all_muses_duality_based_remus(Formula subset, Formula crits, int depth);
-	void extend_mus(Formula &top, Formula &mus);
-
-	//duremus
-	void duremus(Formula subset, Formula crits, int depth);
-	void reduce_mss(Formula &bot, Formula &mss);
-	void duremus_booster(int limit);
-
-	//unibase
-	void unibase();
-	vector<bool> unibase_union(int limit);
-	void unibase2();
-	void unibase2_rec(Formula subset, Formula used);
-
-	//unimus
-	void unimus();
-
-	void counimus();
+	//RIME algorithm functions
+	void rime();
+	void rime_refine(int limit);
 
 	//TOME algorithm functions
 	void find_all_muses_tome();
@@ -112,7 +93,5 @@ public:
 
 	//MARCO algorithm functions
 	void marco_base();
-
-	void comarco();
 };
 #endif

@@ -1320,7 +1320,7 @@ double Solver::progressEstimate() const
 }
 
 void Solver::printIncrementalStats() {
-
+/*
   printf("c---------- Glucose Stats -------------------------\n");
   printf("c restarts              : %" PRIu64"\n", starts);
   printf("c nb ReduceDB           : %" PRIu64"\n", nbReduceDB);
@@ -1336,7 +1336,7 @@ void Solver::printIncrementalStats() {
   printf("c SAT Calls             : %d in %g seconds\n",nbSatCalls,totalTime4Sat);
   printf("c UNSAT Calls           : %d in %g seconds\n",nbUnsatCalls,totalTime4Unsat);
   printf("c--------------------------------------------------\n");
-
+*/
 
 }
 
@@ -1368,7 +1368,7 @@ void Solver::printFooter() const
 
 void Solver::printStats() const
 {
-    double cpu_time = cpuTime();
+ /*   double cpu_time = cpuTime();
     double mem_used = 0;//memUsedPeak();
     printf("c restarts              : %" PRIu64" (%" PRIu64" conflicts in avg)\n", starts,(starts>0 ?conflicts/starts : 0));
     printf("c blocked restarts      : %" PRIu64" (multiple: %" PRIu64") \n", nbstopsrestarts,nbstopsrestartssame);
@@ -1387,6 +1387,7 @@ void Solver::printStats() const
 
     if (mem_used != 0) printf("Memory used           : %.2f MB\n", mem_used);
     printf("c CPU time              : %g s\n", cpu_time);
+    */
 }
 
 void Solver::printStatusLine() const

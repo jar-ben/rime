@@ -10,15 +10,7 @@ Master::Master(string filename, string alg, string ssolver){
         isValidExecutions = 0;
 	algorithm = alg;
 	sat_solver = ssolver;
-	if(ends_with(filename, "smt2")){
-		#ifdef NOSMT
-			print_err("Working with SMT is currently not enabled. To enable it, run 'make cleanCore; make USESMT=YES'. For more info, see README.md.");
-		#else
-		satSolver = new Z3Handle(filename);
-	       	#endif	
-		domain = "smt";
-	}
-	else if(ends_with(filename, "cnf")){
+	if(ends_with(filename, "cnf")){
 		cout << "solver: " << sat_solver << endl;
 		if(sat_solver == "glucose"){
 			satSolver = new GlucoseHandle(filename);
@@ -29,29 +21,14 @@ Master::Master(string filename, string alg, string ssolver){
 		}
 		domain = "sat";
 	}
-	else if(ends_with(filename, "ltl")){
-		#ifdef NOLTL
-			print_err("Working with LTL is currently not enabled. To enable it, run 'make cleanCore; make USELTL=YES'. For more info, see README.md.");
-		#else
-		if(sat_solver == "nuxmv")
-			satSolver = new NuxmvHandle(filename); 
-		else
-			satSolver = new SpotHandle(filename);
-		#endif
-		domain = "ltl";
-	}
 	else
-		print_err("The input file has to have one of these extensions: .smt2, .ltl, or .cnf. See example files in ./examples/ folder.");
+		print_err("The input file must have the .cnf extension and be in the DIMACS format. See example files in ./examples/ folder.");
 	dimension = satSolver->dimension;	
 	cout << "Number of constraints in the input set:" << dimension << endl;
         explorer = new Explorer(dimension);	
-	explorer->satSolver = satSolver;
         verbose = false;
-	depthMUS = 0;
-	dim_reduction = 0.5;
 	output_file = "";
 	validate_mus_c = false;
-	current_depth = 0;
 	unex_sat = unex_unsat = 0;
         hash = random_number();
 	satSolver->hash = hash;
@@ -394,7 +371,7 @@ void Master::mark_MSS_executive(MSS f, bool block_unex){
 	cout << ", intersection: " << count_ones(explorer->mus_intersection);
 	cout << ", union: " << count_ones(uni) << ", dimension: " << dimension;
 	cout << ", seed dimension: " << f.seed_dimension << ", grow duration: " << f.duration;
-	cout << ", grows: " << satSolver->grows << ", depth: " << current_depth;
+	cout << ", grows: " << satSolver->grows;
 	cout << ", sats: " << explorer->mcses.size() << ", unsats: " << explorer->muses.size() << ", bit: " << bit << ", guessed: " << guessed;
 	cout << ", exp calls: " << explorer->calls << ", rotated msses: " << rotated_msses << ", extended: " << extended;
 	cout << endl;
@@ -443,32 +420,14 @@ void Master::enumerate(){
 	if(is_valid(whole))
 		print_err("the input instance is satisfiable");
 
-	if(algorithm == "remus"){
-		find_all_muses_duality_based_remus(Formula (dimension, true), Formula (dimension, false), 0);
-	}
-	if(algorithm == "duremus"){
-		duremus(Formula (dimension, false), Formula (dimension, false), 0);
-	}
 	else if(algorithm == "tome"){
 		find_all_muses_tome();
 	}
 	else if(algorithm == "marco"){
 		marco_base();
 	}
-	else if(algorithm == "comarco"){
-		comarco();
-	}
-	else if(algorithm == "unibase"){
-		unibase();
-	}
-	else if(algorithm == "unibase2"){
-		unibase2();
-	}
-	else if(algorithm == "unimus"){
-		unimus();
-	}
-	else if(algorithm == "counimus"){
-		counimus();
+	else if(algorithm == "rime"){
+		rime();
 	}
 	return;
 }

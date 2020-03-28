@@ -22,7 +22,7 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ***********/
-
+#include <stdexcept> //added by Jaroslav Bendik
 #include "mcsmus/algorithm.hh"
 #include <vector>
 #include <algorithm>
@@ -685,6 +685,10 @@ bool MUSSolver::refute_and_refine(Solver& rrsolver, vector<Lit>& conflict)
     for (Lit l : conflict)
         rrsolver.assumptions().push_back(~l);
     auto val = satsolve(rrsolver, TEST_SOLVE);
+    
+    if(val == l_True){ // Added by Jaroslav Bendik, when I use mcsmus inside my MUS enumeration tool, var(lt) is sometimes <0 at this point which causes a segfault 
+    	    throw std::runtime_error("Unexpected Failure in mcsmus");
+    }
     assert(val != l_True);
     rrsolver.shrinkAssumptions(
         rrsolver.assumptions().size() - crits_size - assumptions.size());
@@ -814,7 +818,7 @@ bool MUSSolver::mus_mishmash_iteration(vector<Lit>& conflict, vector<Lit>& cs,
     // reprove unsatisfiability to refine core
     if (cs.size() > 1) {
         bool success = refute_and_refine(*solver, conflict);
-        if (!success) {
+        if (!success) { //JB: this probably means that refute_and_refine was interrupted (timeouted), i.e. the reportMUS below is an overapproximated MUS
             for (Lit l : conflict)
                 solver->assumptions().push_back(~l);
             conflict.clear();
@@ -832,6 +836,38 @@ bool MUSSolver::mus_mishmash_iteration(vector<Lit>& conflict, vector<Lit>& cs,
     if (amc)
         return addMoreCrits(conflict);
     return true;
+}
+
+
+// Added by JB
+// Add a clause from Explorer (from the overal MUS enumeration tool) that represents a mcs
+void MUSSolver::addMinableBlockDown(vector<int> &block){
+	blockDowns.push_back(block);
+}
+
+// Added by JB
+// checks if the clause unknown[c] is minable critical for F = (unknown \cup crits)
+bool MUSSolver::isMinableCritical(vector<Lit> const& unknown, vector<Lit> const& crits, Lit c){
+	vector<bool> f(theWcnf.nClauses(), false);
+	for(auto l: unknown){
+		f[theWcnf.bvarIdx(in2ex(l)) - 1] = true;
+	}
+	for(auto l: crits){
+		f[theWcnf.bvarIdx(in2ex(l)) - 1] = true;
+	}
+	f[theWcnf.bvarIdx(in2ex(c)) - 1] = false;
+
+	for(auto &block: blockDowns){
+		bool found = false;
+		for(auto cl: block){
+			if(f[cl]){
+				found = true;
+				break;
+			}			
+		}
+		if(!found) return true;// the block (mcs) is not hit by F - {unknown[c]}
+	}
+	return false;
 }
 
 bool MUSSolver::mus_mishmash(vector<Lit>& conflict, vector<Lit> const& all,
@@ -867,6 +903,26 @@ bool MUSSolver::mus_mishmash(vector<Lit>& conflict, vector<Lit> const& all,
 
         auto prev_redundant{redundant_size};
         isMus = mus_mishmash_iteration(conflict, cs, all, require_global_mcses);
+
+	//JB: Critical Clauses Extension based on information from Explorer (the overall MUST tool)
+	if(conflictMining){
+		vector<Lit> newCrits;
+		for(auto c: conflict){
+			if(isMinableCritical(conflict, solver->assumptions(), c)){			
+				minedCriticals++;
+				newCrits.push_back(c);
+			}else{
+			}
+		}
+		for(auto &c: newCrits){
+			moveToCrits(~c);
+			conflict.erase(find(begin(conflict), end(conflict), c));
+		}
+		if(!conflict.empty()){
+			isMus = true;
+		}
+	}
+	//End of added code by JB
 
         auto num_removed{redundant_size - prev_redundant};
         double current_time = cpuTime();
@@ -2122,6 +2178,7 @@ bool MUSSolver::canFlip(Lit p, model_t const& model, Lits... ls)
     return canFlip(theWcnf.hardOccurrences(in2ex(p)), model, ls...);
 }
 
+
 template <typename RotatePred, typename MarkCritFunc>
 int MUSSolver::modelRotate_(Solver& rotsolver, vector<Lit>& conflict,
     Lit inviolated, model_t& model, RotatePred can_rotate_to_p,
@@ -2129,6 +2186,9 @@ int MUSSolver::modelRotate_(Solver& rotsolver, vector<Lit>& conflict,
 {
     assert(!sign(inviolated));
     assert(rotsolver.decisionLevel() == 0);
+    if(var(inviolated) < 0) // Added by Jaroslav Bendik, when I use mcsmus inside my MUS enumeration tool, var(lt) is sometimes <0 at this point which causes a segfault 
+	throw std::runtime_error("Unexpected Failure in mcsmus");
+	    
     Lit violated = in2ex(inviolated);
     auto vc = theWcnf.getGroupVariables(violated);
 
@@ -3191,7 +3251,7 @@ void MUSSolver::reportSolveStats(const char *type, solve_stats const& st) const
     tm.insert(tm.end(), begin(st.times_undef), end(st.times_undef));
     auto cfall = computeSeriesStats(cf);
     auto tmall = computeSeriesStats(tm);
-
+/*
     reportSeriesStats("solver invocations", "conflicts", "%" PRIu64, "%.0f", true, cfall);
     reportSeriesStats("", "sec", "%.3f", "%.3f", false, tmall);
     printf("                      :       %.0f leaves/sec (conflicts+solutions)\n",
@@ -3215,11 +3275,13 @@ void MUSSolver::reportSolveStats(const char *type, solve_stats const& st) const
         printf("                      :       %.0f conflicts/sec\n",
                (cfundef.sum)/double(tmundef.sum));
     }
+    */
 }
 
 void MUSSolver::printStats() const
 {
-    reportSolveStats("total", solvestats_total);
+    /*
+	reportSolveStats("total", solvestats_total);
     for(auto& st : solvestats)
         reportSolveStats(solve_type_desc[st.first].c_str(), st.second);
 
@@ -3298,6 +3360,7 @@ void MUSSolver::printStats() const
            st.pre_time,
            st.pre_time/cpu_time*100.);
     printf("CPU time              : %g s\n", cpu_time);
+	*/
 }
 
 std::ostream& MUSSolver::report_activity(std::string const& act) const
@@ -3325,7 +3388,7 @@ void MUSSolver::printStatusLine()
     if(all_muses) {
         assert(hssolver);
         Solver const& h(*hssolver);
-        printf("| %8.2f |%9" PRIu64" %9" PRIu64" %15" PRIu64" |"
+    /*    printf("| %8.2f |%9" PRIu64" %9" PRIu64" %15" PRIu64" |"
                "%9d %9d %9" PRIu64" |"
                "%9d %9d %9" PRIu64" |"
                "%9d %9d %9d |\n",
@@ -3335,7 +3398,8 @@ void MUSSolver::printStatusLine()
                h.nVars() - theWcnf.nXVars(),
                h.nClauses(), h.getStats().conflicts,
                crits_size, maybe_size, redundant_size);
-        fflush(stdout);
+        */
+	fflush(stdout);
         return;
     }
     printf("| %8.2f | %10lu | %9d %9d %9d | %9d %9d %9d | %7d %8d %6.0f | "
@@ -3415,6 +3479,7 @@ void MUSSolver::verify_unsat(Solver& origsolver,
     ACT("verify") << " val = " << itsval
                   << " conflicts = " << s->getStats().conflicts
                   << std::endl;
+    if(itsval != l_False) std::cout << "varify_unsat failed (it is sat)" << std::endl; //added by JB 
     assert(itsval == l_False);
 }
 
@@ -3443,6 +3508,7 @@ void MUSSolver::verify_mcs(vector<Lit> const& assumptions,
     ACT("verify") << " val = " << itsval
                   << " conflicts = " << s->getStats().conflicts
                   << std::endl;
+    if(itsval != l_False) std::cout << "varify_mcs failed (it is not a mcs)" << std::endl; //added by JB 
     assert(itsval == l_False);
 }
 

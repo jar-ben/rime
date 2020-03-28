@@ -278,7 +278,8 @@ class Int64Option : public Option
     }
 
     virtual void help (bool verbose = false){
-        fprintf(stderr, "  -%-12s = %-8s [", name, type_name);
+        /*
+	    fprintf(stderr, "  -%-12s = %-8s [", name, type_name);
         if (range.begin == INT64_MIN)
             fprintf(stderr, "imin");
         else
@@ -295,6 +296,7 @@ class Int64Option : public Option
             fprintf(stderr, "\n        %s\n", description);
             fprintf(stderr, "\n");
         }
+	*/
     }
 };
 #endif
