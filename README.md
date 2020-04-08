@@ -31,13 +31,13 @@ To see all the available options, run:
 
 ## Other Third-Party Tools
 Besides miniSAT, glucose, and CaDiCaL, we also use two single MUS extraction tools: muser2 [5] and mcsmus [8]. Muser2 is presented in our repository in a binary form whereas mcsmus is packed as a source code and compiled with our code; you do not have to install these tools separately.  
-Moreover, provide an interface for using two MSS/MCS extraction tools: mcsls [6] and cmp [7], and a MaxSAT solver UWrMaxSat [9]. These tools are not packed with our tool; either due to restrictive license or we have just not fully integrated them yet. You do not need to install these tools to be able to run RIME. However, you can if you want. The usage of these tools is documented in the help message (./rime -h).
+Moreover, we provide an interface for using two MSS/MCS extraction tools: mcsls [6] and cmp [7], and a MaxSAT solver UWrMaxSat [9]. These tools are not packed with our tool; either due to restrictive license or we have just not fully integrated them yet. You do not need to install these tools to be able to run RIME. However, you can if you want. The usage of these tools is documented in the help message (./rime -h).
 
 ## Related Tools
 RIME originates from our MUS (minimal unsatisfiable subsets) enumeration tool called MUST (https://github.com/jar-ben/mustool). If you are interested in MUS enumeration, you should give MUST a try. 
 
 ## References
-* [1] A paper that describes our MSS/MCS enumeration algorithm used in RIME is currently under a conference review process.
+* [1] Jaroslav Bendik and Ivana Cerna. Rotation Based MSS/MCS Enumeration. LPAR 2020 (accepted).
 * [2] https://www.labri.fr/perso/lsimon/glucose/
 * [3] http://fmv.jku.at/cadical/
 * [4] http://minisat.se/
@@ -45,6 +45,10 @@ RIME originates from our MUS (minimal unsatisfiable subsets) enumeration tool ca
 * [6] Joao Marques-Silva, Federico Heras, Mikolás Janota, Alessandro Previti, and Anton Belov. On computing minimal correction subsets. IJCAI 2013.
 * [7] Éric Grégoire, Jean-Marie Lagniez, Bertrand Mazure. An experimentally efficient method for (MSS, coMSS) partitioning. AAAI 2014.
 * [8] https://bitbucket.org/gkatsi/mcsmus
+
+## Citing
+If you use our tool (RIME) in your research, please cite our paper that presented RIME:
+* [1] Jaroslav Bendik and Ivana Cerna. Rotation Based MSS/MCS Enumeration. LPAR 2020 (accepted).
 
 ## Contact
 In case of any troubles, do not hesitate to contact me, Jaroslav Bendik, at xbendik=at=gmail.com.
