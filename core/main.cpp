@@ -82,7 +82,7 @@ int main(int argc, char *argv[]){
 
 		solver.enumerate();		
 		cout << "Enumeration completed" << endl;
-		cout << "Number of MSSes: " << solver.muses.size() << endl;
+		cout << "Number of MSSes: " << solver.msses.size() << endl;
 
 	}catch (TCLAP::ArgException &e){
 		std::cerr << "error: " << e.error() << " for arg " << e.argId() << std::endl;
