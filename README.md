@@ -48,7 +48,22 @@ RIME originates from our MUS (minimal unsatisfiable subsets) enumeration tool ca
 
 ## Citing
 If you use our tool (RIME) in your research, please cite our paper that presented RIME:
-* [1] Jaroslav Bendik and Ivana Cerna. Rotation Based MSS/MCS Enumeration. LPAR 2020 (accepted).
+```
+@inproceedings{LPAR23:Rotation_Based_MSS_MCS_Enumeration,
+  author    = {Jaroslav Bend\textbackslash{}'ik and Ivana Cerna},
+  title     = {Rotation Based MSS/MCS Enumeration},
+  booktitle = {LPAR23. LPAR-23: 23rd International Conference on Logic for Programming, Artificial Intelligence and Reasoning},
+  editor    = {Elvira Albert and Laura Kovacs},
+  series    = {EPiC Series in Computing},
+  volume    = {73},
+  pages     = {120--137},
+  year      = {2020},
+  publisher = {EasyChair},
+  bibsource = {EasyChair, https://easychair.org},
+  issn      = {2398-7340},
+  url       = {https://easychair.org/publications/paper/rXZL},
+  doi       = {10.29007/8btb}}
+  ```
 
 ## Contact
 In case of any troubles, do not hesitate to contact me, Jaroslav Bendik, at xbendik=at=gmail.com.
