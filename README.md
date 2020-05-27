@@ -50,7 +50,7 @@ RIME originates from our MUS (minimal unsatisfiable subsets) enumeration tool ca
 If you use our tool (RIME) in your research, please cite our paper that presented RIME:
 ```
 @inproceedings{LPAR23:Rotation_Based_MSS_MCS_Enumeration,
-  author    = {Jaroslav Bend\textbackslash{}'ik and Ivana Cerna},
+  author    = {Jaroslav Bend{\'{\i}}k and Ivana Cern{\'{a}}},
   title     = {Rotation Based MSS/MCS Enumeration},
   booktitle = {LPAR23. LPAR-23: 23rd International Conference on Logic for Programming, Artificial Intelligence and Reasoning},
   editor    = {Elvira Albert and Laura Kovacs},
