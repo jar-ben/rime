@@ -25,8 +25,8 @@ Master::Master(string filename, string alg, string ssolver){
 		print_err("The input file must have the .cnf extension and be in the DIMACS format. See example files in ./examples/ folder.");
 	dimension = satSolver->dimension;	
 	cout << "Number of constraints in the input set:" << dimension << endl;
-        explorer = new Explorer(dimension);	
-        verbose = false;
+    explorer = new Explorer(dimension);	
+    verbose = 2;
 	output_file = "";
 	validate_mus_c = false;
 	unex_sat = unex_unsat = 0;
@@ -138,17 +138,17 @@ int Master::rotateMSS(Formula mss){
 MUS& Master::shrink_formula(Formula &f, Formula crits){
 	int f_size = count_ones(f);
 	chrono::high_resolution_clock::time_point start_time = chrono::high_resolution_clock::now();
-	if(verbose) cout << "shrinking dimension: " << f_size << endl;
+	if(verbose >= 2) cout << "shrinking dimension: " << f_size << endl;
 	f_size = count_ones(f);
 	if(crits.empty()) crits = explorer->critical;
 	if(get_implies){ //get the list of known critical constraints	
 		explorer->getImplied(crits, f);	
-		if(verbose) cout << "# of known critical constraints before shrinking: " << count_ones(crits) << endl;	
+		if(verbose >= 2) cout << "# of known critical constraints before shrinking: " << count_ones(crits) << endl;	
 		if(criticals_rotation && domain == "sat"){
 			int before = count_ones(crits);
 			BooleanSolver *msSolver = static_cast<BooleanSolver*>(satSolver);
 			msSolver->criticals_rotation(crits, f);
-			if(verbose) cout << "# of found critical constraints by criticals rotation: " << (count_ones(crits) - before) << endl;
+			if(verbose >= 2) cout << "# of found critical constraints by criticals rotation: " << (count_ones(crits) - before) << endl;
 		}
 		float c_crits = count_ones(crits);
 		if(int(c_crits) == f_size){ // each constraint in f is critical for f, i.e. it is a MUS 
@@ -213,13 +213,13 @@ MSS Master::grow_formula(Formula &f, Formula conflicts){
 	}
 	int f_size = count_ones(f);
 	chrono::high_resolution_clock::time_point start_time = chrono::high_resolution_clock::now();
-	if(verbose) cout << "growing dimension: " << f_size << endl;
+	if(verbose >= 2) cout << "growing dimension: " << f_size << endl;
 	if(conflicts.empty())
 		conflicts.resize(dimension, false);
 	if(get_implies){ //get the list of known critical constraints	
 		explorer->getConflicts(conflicts, f);	
 		float c_conflicts = count_ones(conflicts);
-		if(verbose) cout << "# of known conflicting constraints before growing: " << int(c_conflicts) << endl;	
+		if(verbose >= 2) cout << "# of known conflicting constraints before growing: " << int(c_conflicts) << endl;	
 		if(int(c_conflicts) == (dimension - f_size)){ // each constraint in f is critical for f, i.e. it is a MUS 
 			return MSS(f, -1, muses.size(), f_size);
 		}		
@@ -256,7 +256,7 @@ MSS Master::grow_formula(Formula &f, Formula conflicts){
 
 //grow formula into a MSS
 void Master::grow_fixpoint(Formula &f){
-	if(verbose) cout << "growing dimension: " << count_ones(f) << endl;
+	if(verbose >= 2) cout << "growing dimension: " << count_ones(f) << endl;
 	Formula conflicts(dimension, false);
 	explorer->getConflicts(conflicts, f);
 	int f_size = count_ones(f);	
@@ -274,11 +274,11 @@ void Master::grow_fixpoint(Formula &f){
 		if(g == 0) break;
 		explorer->getConflicts(conflicts, f);
 	}
-	if(verbose) cout << "grown by: " << (count_ones(f) - f_size) << ", new conflicts: " << (count_ones(conflicts) - c_conflicts) << endl;
+	if(verbose >= 2) cout << "grown by: " << (count_ones(f) - f_size) << ", new conflicts: " << (count_ones(conflicts) - c_conflicts) << endl;
 	
 	for(int i = 0; i < dimension; i++){
 		if(!f[i] && !conflicts[i] && explorer->is_available(i, f)){
-			if(verbose) cout << "iteration: " << i << endl;
+			if(verbose >= 2) cout << "iteration: " << i << endl;
 			f[i] = true;
 			Formula copyMss = f;
 			bool sat = satSolver->solve(copyMss, true, true);
@@ -302,7 +302,7 @@ void Master::grow_fixpoint(Formula &f){
 			}
 		}
 	}
-	if(verbose) cout << "end of grow_fixpoint" << endl;
+	if(verbose >= 2) cout << "end of grow_fixpoint" << endl;
 }
 
 
@@ -365,16 +365,25 @@ void Master::mark_MSS_executive(MSS f, bool block_unex){
 	explorer->block_down(f.bool_mss);
 	chrono::high_resolution_clock::time_point now = chrono::high_resolution_clock::now();
 	auto duration = chrono::duration_cast<chrono::microseconds>( now - initial_time ).count() / float(1000000);
+
+    if(verbose >= 2){
         cout << "Found MSS #" << msses.size() <<  ", mss dimension: " << f.dimension;
-	cout << ", checks: " << satSolver->checks << ", time: " << duration;
-	cout << ", unex sat: " << unex_sat << ", unex unsat: " << unex_unsat << ", criticals: " << explorer->criticals;
-	cout << ", intersection: " << count_ones(explorer->mus_intersection);
-	cout << ", union: " << count_ones(uni) << ", dimension: " << dimension;
-	cout << ", seed dimension: " << f.seed_dimension << ", grow duration: " << f.duration;
-	cout << ", grows: " << satSolver->grows;
-	cout << ", sats: " << explorer->mcses.size() << ", unsats: " << explorer->muses.size() << ", bit: " << bit << ", guessed: " << guessed;
-	cout << ", exp calls: " << explorer->calls << ", rotated msses: " << rotated_msses << ", extended: " << extended;
-	cout << endl;
+        cout << ", checks: " << satSolver->checks << ", time: " << duration;
+        cout << ", unex sat: " << unex_sat << ", unex unsat: " << unex_unsat << ", criticals: " << explorer->criticals;
+        cout << ", intersection: " << count_ones(explorer->mus_intersection);
+        cout << ", union: " << count_ones(uni) << ", dimension: " << dimension;
+        cout << ", seed dimension: " << f.seed_dimension << ", grow duration: " << f.duration;
+        cout << ", grows: " << satSolver->grows;
+        cout << ", sats: " << explorer->mcses.size() << ", unsats: " << explorer->muses.size() << ", bit: " << bit << ", guessed: " << guessed;
+        cout << ", exp calls: " << explorer->calls << ", rotated msses: " << rotated_msses << ", extended: " << extended;
+        cout << endl;
+    }else if(verbose == 1){
+        cout << "MCS ";
+        for(auto c: f.int_mcs){
+            cout << c << " ";
+        }
+        cout << endl;
+    }
 
 	if(output_file != "")
 		write_mss_to_file(f);
@@ -399,15 +408,23 @@ void Master::mark_MUS(MUS& f, bool block_unex){
 
 	chrono::high_resolution_clock::time_point now = chrono::high_resolution_clock::now();
 	auto duration = chrono::duration_cast<chrono::microseconds>( now - initial_time ).count() / float(1000000);
-        if(algorithm == "unibase2") return;
-	cout << "Found MUS #" << muses.size() <<  ", mus dimension: " << f.dimension;
-	cout << ", checks: " << satSolver->checks << ", time: " << duration;
-	cout << ", unex sat: " << unex_sat << ", unex unsat: " << unex_unsat << ", criticals: " << explorer->criticals;
-	cout << ", intersections: " << std::count(explorer->mus_intersection.begin(), explorer->mus_intersection.end(), true);
-	cout << ", union: " << std::count(explorer->mus_union.begin(), explorer->mus_union.end(), true) << ", dimension: " << dimension;
-	cout << ", seed dimension: " << f.seed_dimension << ", shrink duration: " << f.duration;
-	cout << ", shrinks: " << satSolver->shrinks;
-	cout << endl;
+    if(algorithm == "unibase2") return;
+	if(verbose >= 2){
+        cout << "Found MUS #" << muses.size() <<  ", mus dimension: " << f.dimension;
+        cout << ", checks: " << satSolver->checks << ", time: " << duration;
+        cout << ", unex sat: " << unex_sat << ", unex unsat: " << unex_unsat << ", criticals: " << explorer->criticals;
+        cout << ", intersections: " << std::count(explorer->mus_intersection.begin(), explorer->mus_intersection.end(), true);
+        cout << ", union: " << std::count(explorer->mus_union.begin(), explorer->mus_union.end(), true) << ", dimension: " << dimension;
+        cout << ", seed dimension: " << f.seed_dimension << ", shrink duration: " << f.duration;
+        cout << ", shrinks: " << satSolver->shrinks;
+        cout << endl;
+    }else if(verbose == 1){
+        cout << "MUS ";
+        for(auto c: f.int_mus){
+            cout << c << " ";
+        }
+        cout << endl;
+    }
 
 	if(output_file != "")
 		write_mus_to_file(f);

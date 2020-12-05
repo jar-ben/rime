@@ -38,7 +38,8 @@ int main(int argc, char *argv[]){
 
 		TCLAP::SwitchArg conflictsNegation("","conflicts-negation","Negate known conflicting clauses during satsolver.solve() calls.", cmd, false);
 		TCLAP::SwitchArg mssRotation("","mss-rotation","Use the flag to disable the MSS rotation technique.", cmd, true);
-		TCLAP::SwitchArg verbose("v","verbose","Verbose output", cmd, false);
+		TCLAP::ValueArg<int> verbose("v","verbose","Verbose output", false, 2, "A positive integer value.");
+        cmd.add(verbose);
 		vector<string> allowedShrinks {"default", "muser"};
 		TCLAP::ValuesConstraint<string> allowedValsShrink(allowedShrinks);
 		TCLAP::ValueArg<std::string> shrink("s","shrink","Specifies the shrinking algorithm (single MUS extraction subroutine). You can opt between default (implemented via mcsmus) and muser.",false,"default",&allowedValsShrink);

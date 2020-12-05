@@ -7,12 +7,12 @@
 
 
 void Master::rime_refine(int limit){
-	if(verbose) cout << "start of unibase refine" << endl;
+	if(verbose >= 3) cout << "start of unibase refine" << endl;
 	Formula top = explorer->get_unexplored(1, false);
 	Formula uni(dimension, false);
 	int i = 0;
 	while(!top.empty() && i < limit){
-		if(verbose) cout << "  iter: " << i << endl;
+		if(verbose >= 3) cout << "  iter: " << i << endl;
 		Formula original_top = top;
                 if(is_valid(top, true, true)){
                         mark_MSS(MSS(top, -1, msses.size(), count_ones(top)));
@@ -24,7 +24,7 @@ void Master::rime_refine(int limit){
                 }
                 top = explorer->get_unexplored(1, false);
         }
-	if(verbose) cout << "end of unibase refine" << endl;
+	if(verbose >= 3) cout << "end of unibase refine" << endl;
 }
 
 void Master::rime(){
@@ -34,7 +34,7 @@ void Master::rime(){
 	Formula seed = explorer->get_bot_unexplored_containing(couni);	
 	while(!seed.empty()){
 		bit++;
-		if(verbose) cout << "bit: " << bit << endl;
+		if(verbose >= 3) cout << "bit: " << bit << endl;
 		if(is_valid(seed, true, true)){
 			vector<int> missing = subtract_int(seed, whole);
 			if(missing.size() < 5){			
@@ -51,14 +51,14 @@ void Master::rime(){
 		seed = explorer->get_bot_unexplored_containing(couni);
 		//the current uni is whole searched
 		if(seed.empty()){
-			if(verbose) cout << "blurb" << endl;
+			if(verbose >= 3) cout << "blurb" << endl;
 			block_up(uni);
 			block_down(uni);
 			rime_refine(1);
-			if(verbose) cout << "refine base" << endl;
+			if(verbose >= 3) cout << "refine base" << endl;
 			//if(count_ones(uni2) == 0) break; //all MSSes found
 			seed = explorer->get_bot_unexplored_containing(couni);
-			if(verbose) cout << "have seed" << endl;
+			if(verbose >= 3) cout << "have seed" << endl;
 			if(seed.empty()){
 				uni = Formula(dimension, true);
 				couni = Formula(dimension, false);

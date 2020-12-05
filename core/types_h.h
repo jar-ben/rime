@@ -35,6 +35,8 @@ class MSS{
 		for(int i = 0; i < f.size(); i++){
 			if(f[i])
 				int_mss.push_back(i);
+            else
+                int_mcs.push_back(i);
 		}
 		without_conflicts = int_mss;		
 		dimension = int_mss.size();
@@ -45,6 +47,7 @@ class MSS{
 	Formula bool_mss;
 	int seed_dimension;
 	std::vector<int> int_mss;
+    std::vector<int> int_mcs;
 	std::vector<int> without_conflicts;
 	int dimension;
 	float duration;
