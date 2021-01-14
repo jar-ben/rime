@@ -24,7 +24,7 @@ Master::Master(string filename, string alg, string ssolver){
 	else
 		print_err("The input file must have the .cnf extension and be in the DIMACS format. See example files in ./examples/ folder.");
 	dimension = satSolver->dimension;	
-	cout << "Number of constraints in the input set:" << dimension << endl;
+	if(verbose >= 3) cout << "Number of constraints in the input set:" << dimension << endl;
     explorer = new Explorer(dimension);	
     verbose = 2;
 	output_file = "";
@@ -138,12 +138,12 @@ int Master::rotateMSS(Formula mss){
 MUS& Master::shrink_formula(Formula &f, Formula crits){
 	int f_size = count_ones(f);
 	chrono::high_resolution_clock::time_point start_time = chrono::high_resolution_clock::now();
-	if(verbose >= 2) cout << "shrinking dimension: " << f_size << endl;
+	if(verbose >= 3) cout << "shrinking dimension: " << f_size << endl;
 	f_size = count_ones(f);
 	if(crits.empty()) crits = explorer->critical;
 	if(get_implies){ //get the list of known critical constraints	
 		explorer->getImplied(crits, f);	
-		if(verbose >= 2) cout << "# of known critical constraints before shrinking: " << count_ones(crits) << endl;	
+		if(verbose >= 3) cout << "# of known critical constraints before shrinking: " << count_ones(crits) << endl;	
 		if(criticals_rotation && domain == "sat"){
 			int before = count_ones(crits);
 			BooleanSolver *msSolver = static_cast<BooleanSolver*>(satSolver);
@@ -213,7 +213,7 @@ MSS Master::grow_formula(Formula &f, Formula conflicts){
 	}
 	int f_size = count_ones(f);
 	chrono::high_resolution_clock::time_point start_time = chrono::high_resolution_clock::now();
-	if(verbose >= 2) cout << "growing dimension: " << f_size << endl;
+	if(verbose >= 3) cout << "growing dimension: " << f_size << endl;
 	if(conflicts.empty())
 		conflicts.resize(dimension, false);
 	if(get_implies){ //get the list of known critical constraints	
@@ -256,7 +256,7 @@ MSS Master::grow_formula(Formula &f, Formula conflicts){
 
 //grow formula into a MSS
 void Master::grow_fixpoint(Formula &f){
-	if(verbose >= 2) cout << "growing dimension: " << count_ones(f) << endl;
+	if(verbose >= 3) cout << "growing dimension: " << count_ones(f) << endl;
 	Formula conflicts(dimension, false);
 	explorer->getConflicts(conflicts, f);
 	int f_size = count_ones(f);	
@@ -274,7 +274,7 @@ void Master::grow_fixpoint(Formula &f){
 		if(g == 0) break;
 		explorer->getConflicts(conflicts, f);
 	}
-	if(verbose >= 2) cout << "grown by: " << (count_ones(f) - f_size) << ", new conflicts: " << (count_ones(conflicts) - c_conflicts) << endl;
+	if(verbose >= 3) cout << "grown by: " << (count_ones(f) - f_size) << ", new conflicts: " << (count_ones(conflicts) - c_conflicts) << endl;
 	
 	for(int i = 0; i < dimension; i++){
 		if(!f[i] && !conflicts[i] && explorer->is_available(i, f)){
@@ -302,7 +302,7 @@ void Master::grow_fixpoint(Formula &f){
 			}
 		}
 	}
-	if(verbose >= 2) cout << "end of grow_fixpoint" << endl;
+	if(verbose >= 3) cout << "end of grow_fixpoint" << endl;
 }
 
 

@@ -30,7 +30,7 @@ void Master::rime_refine(int limit){
 void Master::rime(){
 	Formula whole(dimension, true);
 	rime_refine(1);
-        cout << "initial uni size: " << count_ones(uni) << ", " << (count_ones(uni)/float(dimension)) << endl;
+        if(verbose >= 3) cout << "initial uni size: " << count_ones(uni) << ", " << (count_ones(uni)/float(dimension)) << endl;
 	Formula seed = explorer->get_bot_unexplored_containing(couni);	
 	while(!seed.empty()){
 		bit++;
