@@ -40,6 +40,8 @@ int main(int argc, char *argv[]){
 		TCLAP::SwitchArg mssRotation("","mss-rotation","Use the flag to disable the MSS rotation technique.", cmd, true);
 		TCLAP::ValueArg<int> verbose("v","verbose","Verbose output", false, 2, "A positive integer value.");
         cmd.add(verbose);
+		TCLAP::ValueArg<int> mcsLimit("","mcs-limit","Limit the number of identified MCSes. -1 means unlimited (i.e., all MCS will be identifed).", false, -1, "-1,inf");
+        cmd.add(mcsLimit);
 		vector<string> allowedShrinks {"default", "muser"};
 		TCLAP::ValuesConstraint<string> allowedValsShrink(allowedShrinks);
 		TCLAP::ValueArg<std::string> shrink("s","shrink","Specifies the shrinking algorithm (single MUS extraction subroutine). You can opt between default (implemented via mcsmus) and muser.",false,"default",&allowedValsShrink);
@@ -80,6 +82,7 @@ int main(int argc, char *argv[]){
 		solver.satSolver->mcslsArgs = mcslsArgs.getValue();
 		solver.mss_rotation = mssRotation.getValue();
 		solver.satSolver->shrinkMining = shrinkMining.getValue();
+		solver.mcs_limit = mcsLimit.getValue();
 
 		solver.enumerate();		
 		cout << "Enumeration completed" << endl;

@@ -48,6 +48,7 @@ public:
 	int unex_sat;
 	int guessed;
 	int rotated_msses;
+	int mcs_limit; //identify only the first mcs_limit MCSes
 	chrono::high_resolution_clock::time_point initial_time;
 	vector<MUS> muses;
 	vector<MSS> msses;

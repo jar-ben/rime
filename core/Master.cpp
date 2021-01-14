@@ -127,6 +127,7 @@ int Master::rotateMSS(Formula mss){
 						mark_MSS_executive(MSS(copy, -1, msses.size(), count_ones(copy)));
 						rotated_msses++;
 						rots++;
+						if(msses.size() >= mcs_limit) return rots; //a limit on the number of MCSes/MSSes was set and achieved
 					}
 				}
 			}	
@@ -278,7 +279,7 @@ void Master::grow_fixpoint(Formula &f){
 	
 	for(int i = 0; i < dimension; i++){
 		if(!f[i] && !conflicts[i] && explorer->is_available(i, f)){
-			if(verbose >= 2) cout << "iteration: " << i << endl;
+			if(verbose >= 3) cout << "iteration: " << i << endl;
 			f[i] = true;
 			Formula copyMss = f;
 			bool sat = satSolver->solve(copyMss, true, true);
@@ -394,9 +395,10 @@ void Master::mark_MSS_executive(MSS f, bool block_unex){
 void Master::mark_MSS(MSS f, bool block_unex){
 	mark_MSS_executive(f, block_unex);
 	while(!rotation_queue.empty()){
+		if(msses.size() >= mcs_limit) return; //a limit on the number of MCSes/MSSes was set and achieved
 		Formula mss = rotation_queue.back();
 		rotation_queue.pop_back();
-		rotateMSS(mss);
+		rotateMSS(mss);		
 	}
 }
 

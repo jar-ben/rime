@@ -17,6 +17,7 @@ void Master::rime_refine(int limit){
                 if(is_valid(top, true, true)){
                         mark_MSS(MSS(top, -1, msses.size(), count_ones(top)));
                         guessed++;	
+			if(msses.size() == mcs_limit) return; //a limit on the number of MCSes/MSSes was set and achieved
                 }else{
                         MUS mus = shrink_formula(top);
                         mark_MUS(mus);
@@ -33,6 +34,7 @@ void Master::rime(){
         if(verbose >= 3) cout << "initial uni size: " << count_ones(uni) << ", " << (count_ones(uni)/float(dimension)) << endl;
 	Formula seed = explorer->get_bot_unexplored_containing(couni);	
 	while(!seed.empty()){
+		if(msses.size() >= mcs_limit) return; //a limit on the number of MCSes/MSSes was set and achieved
 		bit++;
 		if(verbose >= 3) cout << "bit: " << bit << endl;
 		if(is_valid(seed, true, true)){
