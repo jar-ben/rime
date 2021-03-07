@@ -77,7 +77,6 @@ bool BooleanSolver::parse(string path){
                             istringstream is(line);
                             int weight;
                             is >> weight;
-                            cout << hardWeight << " " << weight << endl;
                             getline(is, line);
                             if(weight == hardWeight){
                                 hard_clauses.push_back(clauses_str.size());
