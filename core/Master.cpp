@@ -26,6 +26,16 @@ Master::Master(string filename, string alg, string ssolver){
 	dimension = satSolver->dimension;	
 	if(verbose >= 3) cout << "Number of constraints in the input set:" << dimension << endl;
     explorer = new Explorer(dimension);	
+    if(satSolver->hard_clauses.size() > 0){
+        cout << "Identified " << satSolver->hard_clauses.size() << " hard clauses in the input .wcnf file" << endl;
+        Formula whole(dimension, true);
+        for(auto cid: satSolver->hard_clauses){
+            whole[cid] = false;
+            block_down(whole); //enforce that the clause with cid will be presented in all unexplored subsets
+            whole[cid] = true;    
+        }
+    }
+
     verbose = 2;
 	output_file = "";
 	validate_mus_c = false;

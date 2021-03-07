@@ -12,7 +12,7 @@ public:
 	BooleanSolver(std::string filename);
     	~BooleanSolver();
 	std::vector<std::vector<int>> clauses;
-	int vars;
+    int vars;
 	std::vector<std::string> clauses_str;
 	std::unordered_map<std::string, int> clauses_unique_map;
 	std::map<std::vector<int>,int> clauses_map;

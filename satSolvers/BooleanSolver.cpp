@@ -50,9 +50,12 @@ bool BooleanSolver::parse(string path){
         if (!infile.is_open())
                 print_err("wrong input file");
 
+        bool wcnf = ends_with(path, "wcnf");
+        int hardWeight = 0;
         string line;
         vector<int> clause;
         string pom;
+        int pomInt;
         while (getline(infile, line))
         {
                 if (line[0] == 'p'){
@@ -60,6 +63,8 @@ bool BooleanSolver::parse(string path){
                         is >> pom;      // p
                         is >> pom;      // cnf
                         is >> vars;     //number of variables
+                        is >> pomInt;   //number of clauses
+                        if(wcnf) is >> hardWeight;
                 }
                 else if(line[0] == 'c')
                         continue;
@@ -68,8 +73,19 @@ bool BooleanSolver::parse(string path){
                         continue;
                 }
                 else{
+                        if(wcnf){
+                            istringstream is(line);
+                            int weight;
+                            is >> weight;
+                            cout << hardWeight << " " << weight << endl;
+                            getline(is, line);
+                            if(weight == hardWeight){
+                                hard_clauses.push_back(clauses_str.size());
+                            }
+                        }
                         clauses_str.push_back(line);
                         clauses_unique_map[line] = clauses_str.size() - 1;
+                        
                 }
         }
         cout << "vars: " << vars << endl;

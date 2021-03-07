@@ -15,7 +15,8 @@ public:
 	std::string shrink_alg;
 	std::string grow_alg;
 	std::string sat_solver;
-	int checks;
+    std::vector<int> hard_clauses;
+    int checks;
 	int hash;
 	int shrinks;
 	int grows;
