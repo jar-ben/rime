@@ -12,19 +12,25 @@ public:
 	BooleanSolver(std::string filename);
     	~BooleanSolver();
 	std::vector<std::vector<int>> clauses;
-	int vars;
+    std::vector<std::vector<int>> hard_clauses;
+    int vars;
+	std::vector<std::string> hard_clauses_str;
 	std::vector<std::string> clauses_str;
 	std::unordered_map<std::string, int> clauses_unique_map;
 	std::map<std::vector<int>,int> clauses_map;
+    std::map<std::vector<int>,int> hard_clauses_map;
 
 	bool parse(std::string filename);
 	void add_clause(std::vector<int> cl);
+    void add_hard_clause(std::vector<int> cl);
 	std::string toString(std::vector<bool> &f);
 
         //model rotation
         int rotated_crits;
         std::vector<std::vector<int>> hitmap_pos;
         std::vector<std::vector<int>> hitmap_neg;
+        std::vector<std::vector<int>> hard_hitmap_pos;
+        std::vector<std::vector<int>> hard_hitmap_neg;
         std::vector<bool> flip_edges_computed;
         std::vector<std::vector<std::vector<int>>> flip_edges; // flip_edges[i][j][k] - i-th clause, j-th literal in the clause, k-th edge from i-th clause under j-th literal in the flip grap
         std::vector<std::vector<int>> flip_edges_flatten;
